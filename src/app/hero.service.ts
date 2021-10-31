@@ -38,16 +38,20 @@ export class HeroService {
       tap(_ => this.log(`Fetched Hero ID=${id}`)),
       catchError(this.handleError<Hero>(`getHero id=${id}`))
     );
-
-    const hero = HEROES.find((h) => h.id === id)!;
-    this.log(`Hero Service: Fetched hero id:${hero.id}`);
-    return of(hero);
   }
 
   updateHero(hero: Hero): Observable<any> {
     return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
       tap(_ => this.log(`Updated Hero ID=${hero.id}`)),
       catchError(this.handleError<any>('updateHero'))
+    );
+  }
+
+  /** POST: add a new hero to the server */
+  addHero(hero: Hero): Observable<any> {
+    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap((newHero: Hero) => this.log(`Added Hero w/ id=${newHero.id}`)),
+      catchError(this.handleError<Hero>('addHero'))
     );
   }
 
