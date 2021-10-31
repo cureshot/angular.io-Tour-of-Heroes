@@ -11,11 +11,10 @@ import { MessageService } from './message.service';
   providedIn: 'root',
 })
 export class HeroService {
-
   private heroesUrl = 'api/heroes'; // URL to web api
 
   httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
 
   constructor(
@@ -25,7 +24,7 @@ export class HeroService {
 
   getHeroes(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesUrl).pipe(
-      tap(_ => this.log('Fetched heroes.')),
+      tap((_) => this.log('Fetched heroes.')),
       catchError(this.handleError<Hero[]>('getHeroes', []))
     );
   }
@@ -35,14 +34,14 @@ export class HeroService {
     const url = `${this.heroesUrl}/${id}`;
 
     return this.http.get<Hero>(url).pipe(
-      tap(_ => this.log(`Fetched Hero ID=${id}`)),
+      tap((_) => this.log(`Fetched hero ID=${id}`)),
       catchError(this.handleError<Hero>(`getHero id=${id}`))
     );
   }
 
   updateHero(hero: Hero): Observable<any> {
     return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap(_ => this.log(`Updated Hero ID=${hero.id}`)),
+      tap((_) => this.log(`Updated hero ID=${hero.id}`)),
       catchError(this.handleError<any>('updateHero'))
     );
   }
@@ -50,7 +49,7 @@ export class HeroService {
   /** POST: add a new hero to the server */
   addHero(hero: Hero): Observable<any> {
     return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap((newHero: Hero) => this.log(`Added Hero w/ id=${newHero.id}`)),
+      tap((newHero: Hero) => this.log(`Added hero w/ id=${newHero.id}`)),
       catchError(this.handleError<Hero>('addHero'))
     );
   }
@@ -60,8 +59,25 @@ export class HeroService {
     const url = `${this.heroesUrl}/${id}`;
 
     return this.http.delete<Hero>(url, this.httpOptions).pipe(
-      tap(_ => this.log(`Deleted Hero ID=${id}`)),
+      tap((_) => this.log(`Deleted hero ID=${id}`)),
       catchError(this.handleError<Hero>(`deleteHero id=${id}`))
+    );
+  }
+
+  /* GET heroes whose name contains search term */
+  searchHeroes(term: string): Observable<Hero[]> {
+    term = term.trim();
+    if (!term) {
+      return of([]);
+    }
+
+    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
+      tap((x) =>
+        x.length
+          ? this.log(`Found heroes matching "${term}"`)
+          : this.log(`No heroes matching "${term}"`)
+      ),
+      catchError(this.handleError<Hero[]>('searchHeroes', []))
     );
   }
 
